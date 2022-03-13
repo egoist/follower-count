@@ -25,6 +25,8 @@ export type Options =
       username: string
     }
 
+const USER_AGENT = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36`
+
 export const getFollowerCount = async (options: Options): Promise<number> => {
   if (options.type === "instagram") {
     const sessionId = await getIgSessionId(
@@ -55,6 +57,9 @@ export const getFollowerCount = async (options: Options): Promise<number> => {
 async function getTikTokFollowerCount(username: string) {
   const { data } = await axios(`https://www.tiktok.com/@${username}`, {
     responseType: "text",
+    headers: {
+      "user-agent": USER_AGENT,
+    },
   })
 
   const m = /"authorStats":{"followerCount":(\d+),/.exec(data)
@@ -71,8 +76,9 @@ async function getTwitterFollowerCount(username: string) {
     url: `https://twitter.com/${username}`,
     htmlSelector: `a[href$="/followers"]`,
   })
-  const text = stripHTMLTags(html)
+  const text = stripHTMLTags(html).split(" ")[0]
   const lastChar = text[text.length - 1].toLowerCase()
+
   const times = lastChar === "m" ? 1000000 : lastChar === "k" ? 1000 : 1
   const count = Number(text.replace(/[^.\d]+/g, "")) * times
   await cleanup()

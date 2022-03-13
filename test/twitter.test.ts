@@ -8,5 +8,5 @@ test("twitter", async () => {
   })
 
   console.log(count)
-  expect(typeof count).toBe("number")
+  expect(count).toBeGreaterThan(0)
 })

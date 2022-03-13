@@ -1,10 +1,10 @@
 import { test, expect } from "vitest"
 import { getFollowerCount } from "../src"
 
-test("youtube", async () => {
+test("tiktok", async () => {
   const count = await getFollowerCount({
-    type: "youtube",
-    channel: "UCq72e16zV6HGkDZmTzn-mDg",
+    type: "tiktok",
+    username: "cristiano.ronaldo_._",
   })
 
   console.log(count)
