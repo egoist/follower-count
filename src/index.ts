@@ -72,9 +72,12 @@ function stripHTMLTags(html: string) {
 }
 
 async function getTwitterFollowerCount(username: string) {
+  const htmlSelector = `a[href$="/followers"]`
   const html = await request({
     url: `https://twitter.com/${username}`,
-    htmlSelector: `a[href$="/followers"]`,
+    htmlSelector,
+    wait: htmlSelector,
+    sandbox: !process.env.FOLLOWER_COUNT_NO_SANDBOX
   })
   const text = stripHTMLTags(html).split(" ")[0]
   const lastChar = text[text.length - 1].toLowerCase()
