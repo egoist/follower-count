@@ -1,7 +1,7 @@
 import { igApi as IgApi, getSessionId as getIgSessionId } from "insta-fetcher"
 import axios from "axios"
 import { getChannelInfo } from "yt-channel-info"
-import { cleanup, request } from "taki"
+import pptr from "puppeteer"
 
 export type Options =
   | {
@@ -21,6 +21,7 @@ export type Options =
       username: string
     }
   | {
+      /** Will use Chrome to render the Twitter profile */
       type: "twitter"
       username: string
     }
@@ -58,6 +59,7 @@ async function getTikTokFollowerCount(username: string) {
   const { data } = await axios(`https://www.tiktok.com/@${username}`, {
     responseType: "text",
     headers: {
+      // TikTok requires a user-agent, otherwise it will return an empty string
       "user-agent": USER_AGENT,
     },
   })
@@ -67,23 +69,29 @@ async function getTikTokFollowerCount(username: string) {
   return m ? parseInt(m[1]) : 0
 }
 
-function stripHTMLTags(html: string) {
-  return html.replace(/<[^>]*>/g, "")
-}
-
 async function getTwitterFollowerCount(username: string) {
   const htmlSelector = `a[href$="/followers"]`
-  const html = await request({
-    url: `https://twitter.com/${username}`,
-    htmlSelector,
-    wait: htmlSelector,
-    sandbox: !process.env.FOLLOWER_COUNT_NO_SANDBOX
+  const browser = await pptr.launch({
+    args: ["--no-sandbox"],
   })
-  const text = stripHTMLTags(html).split(" ")[0]
+  const page = await browser.newPage()
+  await page.goto(`https://twitter.com/${username}`)
+  await page.waitForSelector(htmlSelector)
+  const text = await page.evaluate(
+    (selector) => {
+      const text = document.querySelector(selector)!.textContent || ""
+      return text.split(" ")[0]
+    },
+    [htmlSelector],
+  )
+
   const lastChar = text[text.length - 1].toLowerCase()
 
   const times = lastChar === "m" ? 1000000 : lastChar === "k" ? 1000 : 1
   const count = Number(text.replace(/[^.\d]+/g, "")) * times
-  await cleanup()
+
+  await page.close()
+  await browser.close()
+
   return count
 }

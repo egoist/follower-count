@@ -32,10 +32,9 @@
   },
   "dependencies": {
     "axios": "^0.26.1",
-    "happy-dom": "^2.46.3",
     "insta-fetcher": "^1.3.18",
     "node-fetch": "^3.2.3",
-    "taki": "^3.0.0",
+    "puppeteer": "^13.5.1",
     "yt-channel-info": "^3.0.0"
   }
 }

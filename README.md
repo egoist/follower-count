@@ -32,6 +32,11 @@ await getFollowerCount({
 })
 ```
 
+Notes:
+
+- `instagram` requires authentication, you can create a dummy account for this
+- `twitter` follower count is fetched using headless chrome
+
 ## Documentation
 
 https://paka.dev/npm/follower-count
