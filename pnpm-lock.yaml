@@ -5,6 +5,7 @@ specifiers:
   '@types/node': ^17.0.21
   axios: ^0.26.1
   insta-fetcher: ^1.3.18
+  kanpai: ^0.10.1
   node-fetch: ^3.2.3
   prettier: 2.5.1
   puppeteer: ^13.5.1
@@ -23,6 +24,7 @@ dependencies:
 devDependencies:
   '@egoist/prettier-config': 1.0.0
   '@types/node': 17.0.21
+  kanpai: 0.10.1
   prettier: 2.5.1
   tsup: 5.11.13_typescript@4.5.4
   typescript: 4.5.4
@@ -996,6 +998,12 @@ packages:
 
   /json-parse-even-better-errors/2.3.1:
     resolution: {integrity: sha512-xyFwyhro/JEof6Ghe2iz2NcXoj2sloNsWr/XsERDK/oiPCfaNhl5ONfp+jQdAZRQQ0IJWNzH9zIZF7li91kh2w==}
+    dev: true
+
+  /kanpai/0.10.1:
+    resolution: {integrity: sha512-EUmZoO4FxphrH0blToWScMEUWyqHUg6x31WgW8ruUhj6EPy4FpI2j+z0LJ3qnUiIeGObrkx/xToH2hFcxLwtuA==}
+    engines: {node: '>=14.0.0'}
+    hasBin: true
     dev: true
 
   /lines-and-columns/1.1.6:
