@@ -1,5 +1,9 @@
 ## Unreleased
 
+No unreleased changes.
+
+## 0.1.2
+
 - Accept a URL as youtube channel:
   ```js
   getFollowerCount({
