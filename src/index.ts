@@ -14,6 +14,7 @@ export type Options =
     }
   | {
       type: "youtube"
+      /** Channel ID or channel URL (https://www.youtube.com/c/CHANNEL_ID) */
       channel: string
     }
   | {
@@ -28,6 +29,13 @@ export type Options =
 
 const USER_AGENT = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36`
 
+const getYoutubeChannelId = (channel: string) => {
+  if (channel.startsWith("https:")) {
+    return channel.replace("https://www.youtube.com/c/", "").split("/")[0]
+  }
+  return channel
+}
+
 export const getFollowerCount = async (options: Options): Promise<number> => {
   if (options.type === "instagram") {
     const sessionId = await getIgSessionId(
@@ -40,7 +48,9 @@ export const getFollowerCount = async (options: Options): Promise<number> => {
   }
 
   if (options.type === "youtube") {
-    const info = await getChannelInfo({ channelId: options.channel })
+    const info = await getChannelInfo({
+      channelId: getYoutubeChannelId(options.channel),
+    })
     return info.subscriberCount
   }
 

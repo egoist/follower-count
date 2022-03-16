@@ -4,7 +4,7 @@ import { getFollowerCount } from "../src"
 test("tiktok", async () => {
   const count = await getFollowerCount({
     type: "tiktok",
-    username: "cristiano.ronaldo_._",
+    username: "ronaldo",
   })
 
   console.log(count)
