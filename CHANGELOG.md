@@ -1,5 +1,9 @@
 ## Unreleased
 
+No unreleased changes.
+
+## 0.1.3
+
 - twitter: Allow to pass a custom path to Chromium executable, by default it looks for the Chrome/Chromium executable on your system, but if you're using this on AWS lambda or Google Cloud Functions, you can use this with `chrome-aws-lambda`.
 
 ## 0.1.2
