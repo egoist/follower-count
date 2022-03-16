@@ -1,7 +1,8 @@
 import { igApi as IgApi, getSessionId as getIgSessionId } from "insta-fetcher"
 import axios from "axios"
 import { getChannelInfo } from "yt-channel-info"
-import pptr from "puppeteer"
+import { chromium, devices } from "playwright-core"
+import { findChrome } from "./find-chrome"
 
 export type Options =
   | {
@@ -25,6 +26,12 @@ export type Options =
       /** Will use Chrome to render the Twitter profile */
       type: "twitter"
       username: string
+      /**
+       * By default it uses the chromium executable on your system
+       * If you're running on AWS lambda or Google Cloud functions
+       * You can also use chrome-aws-lambda
+       */
+      chromiumPath?: string
     }
 
 const USER_AGENT = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36`
@@ -59,7 +66,7 @@ export const getFollowerCount = async (options: Options): Promise<number> => {
   }
 
   if (options.type === "twitter") {
-    return getTwitterFollowerCount(options.username)
+    return getTwitterFollowerCount(options.username, options.chromiumPath)
   }
 
   throw new Error(`Unknown type: ${(options as any).type}`)
@@ -79,21 +86,25 @@ async function getTikTokFollowerCount(username: string) {
   return m ? parseInt(m[1]) : 0
 }
 
-async function getTwitterFollowerCount(username: string) {
+async function getTwitterFollowerCount(
+  username: string,
+  chromiumPath?: string,
+) {
   const htmlSelector = `a[href$="/followers"]`
-  const browser = await pptr.launch({
+  const browser = await chromium.launch({
     args: ["--no-sandbox"],
+    executablePath: chromiumPath || findChrome(),
   })
-  const page = await browser.newPage()
+  const context = await browser.newContext({
+    ...devices["iPhone 12"],
+  })
+  const page = await context.newPage()
   await page.goto(`https://twitter.com/${username}`)
   await page.waitForSelector(htmlSelector)
-  const text = await page.evaluate(
-    (selector) => {
-      const text = document.querySelector(selector)!.textContent || ""
-      return text.split(" ")[0]
-    },
-    [htmlSelector],
-  )
+  const text = await page.evaluate((selector) => {
+    const text = document.querySelector(selector)!.textContent || ""
+    return text.split(" ")[0]
+  }, htmlSelector)
 
   const lastChar = text[text.length - 1].toLowerCase()
 
