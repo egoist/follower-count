@@ -1,6 +1,6 @@
 {
   "name": "follower-count",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "My awesome typescript library",
   "publishConfig": {
     "access": "public"

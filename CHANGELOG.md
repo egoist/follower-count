@@ -1,5 +1,9 @@
 ## Unreleased
 
+No unreleased changes.
+
+## 0.2.0
+
 - twitter: allow to pass a playwright browser context instead of chromium executable path.
 
   ```js
