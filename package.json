@@ -1,7 +1,7 @@
 {
   "name": "follower-count",
   "version": "0.2.0",
-  "description": "My awesome typescript library",
+  "description": "Get follower count for Instagram, Twitter, TikTok, Youtube accounts",
   "publishConfig": {
     "access": "public"
   },
