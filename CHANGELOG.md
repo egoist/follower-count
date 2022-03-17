@@ -1,6 +1,24 @@
 ## Unreleased
 
-No unreleased changes.
+- twitter: allow to pass a playwright browser context instead of chromium executable path.
+
+  ```js
+  // before:
+  await getFollowerCount({
+    type: "twitter",
+    username: "cristiano",
+    chromiumPath: "/path/to/chromium",
+  })
+
+  // after:
+  import { getBrowserContext, destroyBrowser } from "follower-count"
+  await getFollowerCount({
+    type: "twitter",
+    username: "cristiano",
+    browserContext: getBrowserContext({ chromiumPath: "/path/to/chromium" }),
+  })
+  await destroyBrowser()
+  ```
 
 ## 0.1.3
 

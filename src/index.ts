@@ -1,8 +1,7 @@
 import { igApi as IgApi, getSessionId as getIgSessionId } from "insta-fetcher"
 import axios from "axios"
 import { getChannelInfo } from "yt-channel-info"
-import { chromium, devices } from "playwright-core"
-import { findChrome } from "./find-chrome"
+import { BrowserContext } from "playwright-core"
 
 export type Options =
   | {
@@ -27,11 +26,19 @@ export type Options =
       type: "twitter"
       username: string
       /**
-       * By default it uses the chromium executable on your system
-       * If you're running on AWS lambda or Google Cloud functions
-       * You can also use chrome-aws-lambda
+       * A playwright chromium browser context
+       * @example
+       * ```js
+       * import { getBrowserContext, destroyBrowser } from "follower-count"
+       * await getFollowerCount({
+       *   type: "twitter",
+       *   username: "cristiano",
+       *   browserContext: getBrowserContext({ chromiumPath: "/path/to/chromium" }),
+       * })
+       * await destroyBrowser()
+       * ```
        */
-      chromiumPath?: string
+      browserContext: BrowserContext
     }
 
 const USER_AGENT = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36`
@@ -45,20 +52,11 @@ const getYoutubeChannelId = (channel: string) => {
 
 export const getFollowerCount = async (options: Options): Promise<number> => {
   if (options.type === "instagram") {
-    const sessionId = await getIgSessionId(
-      options.auth.username,
-      options.auth.password,
-    )
-    const ig = new IgApi(sessionId)
-    const user = await ig.fetchUserV2(options.username)
-    return user.edge_followed_by.count
+    return getInstagramFollowerCount(options.username, options.auth)
   }
 
   if (options.type === "youtube") {
-    const info = await getChannelInfo({
-      channelId: getYoutubeChannelId(options.channel),
-    })
-    return info.subscriberCount
+    return getYoutubeFollowerCount(options.channel)
   }
 
   if (options.type === "tiktok") {
@@ -66,13 +64,30 @@ export const getFollowerCount = async (options: Options): Promise<number> => {
   }
 
   if (options.type === "twitter") {
-    return getTwitterFollowerCount(options.username, options.chromiumPath)
+    return getTwitterFollowerCount(options.username, options.browserContext)
   }
 
   throw new Error(`Unknown type: ${(options as any).type}`)
 }
 
-async function getTikTokFollowerCount(username: string) {
+export async function getInstagramFollowerCount(
+  username: string,
+  auth: { username: string; password: string },
+) {
+  const sessionId = await getIgSessionId(auth.username, auth.password)
+  const ig = new IgApi(sessionId)
+  const user = await ig.fetchUserV2(username)
+  return user.edge_followed_by.count
+}
+
+export async function getYoutubeFollowerCount(channel: string) {
+  const info = await getChannelInfo({
+    channelId: getYoutubeChannelId(channel),
+  })
+  return info.subscriberCount
+}
+
+export async function getTikTokFollowerCount(username: string) {
   const { data } = await axios(`https://www.tiktok.com/@${username}`, {
     responseType: "text",
     headers: {
@@ -86,19 +101,12 @@ async function getTikTokFollowerCount(username: string) {
   return m ? parseInt(m[1]) : 0
 }
 
-async function getTwitterFollowerCount(
+export async function getTwitterFollowerCount(
   username: string,
-  chromiumPath?: string,
+  browserContext: BrowserContext,
 ) {
   const htmlSelector = `a[href$="/followers"]`
-  const browser = await chromium.launch({
-    args: ["--no-sandbox"],
-    executablePath: chromiumPath || findChrome(),
-  })
-  const context = await browser.newContext({
-    ...devices["iPhone 12"],
-  })
-  const page = await context.newPage()
+  const page = await browserContext.newPage()
   await page.goto(`https://twitter.com/${username}`)
   await page.waitForSelector(htmlSelector)
   const text = await page.evaluate((selector) => {
@@ -112,7 +120,8 @@ async function getTwitterFollowerCount(
   const count = Number(text.replace(/[^.\d]+/g, "")) * times
 
   await page.close()
-  await browser.close()
 
   return count
 }
+
+export * from "./browser"

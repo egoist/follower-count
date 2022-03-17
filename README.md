@@ -15,8 +15,8 @@ npm i follower-count
 ## Example
 
 ```ts
+// Instagram:
 import { getFollowerCount } from "follower-count"
-
 await getFollowerCount({
   type: "instagram",
   username: "cristiano",
@@ -26,10 +26,17 @@ await getFollowerCount({
   },
 })
 
+// Twitter:
+import { getBrowserContext, destroyBrowser } from "follower-count"
 await getFollowerCount({
   type: "twitter",
   username: "cristiano",
+  browserContext: getBrowserContext({
+    // optional
+    chromiumPath: "/path/to/chromium",
+  }),
 })
+await destroyBrowser()
 ```
 
 Notes:
