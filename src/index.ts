@@ -76,15 +76,16 @@ export async function getInstagramFollowerCount(
 ) {
   const sessionId = await getIgSessionId(auth.username, auth.password)
   const ig = new IgApi(sessionId)
-  const user = await ig.fetchUserV2(username)
-  return user.edge_followed_by.count
+  const user = await ig.fetchUser(username)
+  return user.followers
 }
 
 export async function getYoutubeFollowerCount(channel: string) {
   const info = await getChannelInfo({
     channelId: getYoutubeChannelId(channel),
   })
-  return info.subscriberCount
+  // Not sure why subscriberCount might be a float
+  return Math.floor(info.subscriberCount)
 }
 
 export async function getTikTokFollowerCount(username: string) {

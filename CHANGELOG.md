@@ -1,6 +1,6 @@
 ## Unreleased
 
-No unreleased changes.
+- Ensure the follower count of `youtube` is an integer
 
 ## 0.2.0
 
