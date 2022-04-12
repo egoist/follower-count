@@ -45,7 +45,9 @@ const USER_AGENT = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/
 
 const getYoutubeChannelId = (channel: string) => {
   if (channel.startsWith("https:")) {
-    return channel.replace("https://www.youtube.com/c/", "").split("/")[0]
+    return channel
+      .replace(/^https?:\/\/www.youtube.com\/(c|user)\//, "")
+      .split("/")[0]
   }
   return channel
 }

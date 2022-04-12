@@ -1,6 +1,6 @@
 ## Unreleased
 
-No unreleased changes.
+- fix: properly get youtube channel id
 
 ## 0.2.1
 
