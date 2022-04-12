@@ -3,6 +3,10 @@ import axios from "axios"
 import { getChannelInfo } from "yt-channel-info"
 import { BrowserContext } from "playwright-core"
 import { getYoutubeChannelId } from "./utils"
+import {
+  getTwitterFollowerCountWithBrowser,
+  getTwitterFollowerCountWithEmbedApi,
+} from "./twitter"
 
 export type Options =
   | {
@@ -23,7 +27,6 @@ export type Options =
       username: string
     }
   | {
-      /** Will use Chrome to render the Twitter profile */
       type: "twitter"
       username: string
       /**
@@ -39,7 +42,7 @@ export type Options =
        * await destroyBrowser()
        * ```
        */
-      browserContext: BrowserContext
+      browserContext?: BrowserContext
     }
 
 const USER_AGENT = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36`
@@ -58,7 +61,12 @@ export const getFollowerCount = async (options: Options): Promise<number> => {
   }
 
   if (options.type === "twitter") {
-    return getTwitterFollowerCount(options.username, options.browserContext)
+    return options.browserContext
+      ? getTwitterFollowerCountWithBrowser(
+          options.username,
+          options.browserContext,
+        )
+      : getTwitterFollowerCountWithEmbedApi(options.username)
   }
 
   throw new Error(`Unknown type: ${(options as any).type}`)
@@ -94,29 +102,6 @@ export async function getTikTokFollowerCount(username: string) {
   const m = /"authorStats":{"followerCount":(\d+),/.exec(data)
 
   return m ? parseInt(m[1]) : 0
-}
-
-export async function getTwitterFollowerCount(
-  username: string,
-  browserContext: BrowserContext,
-) {
-  const htmlSelector = `a[href$="/followers"]`
-  const page = await browserContext.newPage()
-  await page.goto(`https://twitter.com/${username}`)
-  await page.waitForSelector(htmlSelector)
-  const text = await page.evaluate((selector) => {
-    const text = document.querySelector(selector)!.textContent || ""
-    return text.split(" ")[0]
-  }, htmlSelector)
-
-  const lastChar = text[text.length - 1].toLowerCase()
-
-  const times = lastChar === "m" ? 1000000 : lastChar === "k" ? 1000 : 1
-  const count = Number(text.replace(/[^.\d]+/g, "")) * times
-
-  await page.close()
-
-  return count
 }
 
 export * from "./browser"

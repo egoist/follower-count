@@ -31,10 +31,6 @@ import { getBrowserContext, destroyBrowser } from "follower-count"
 await getFollowerCount({
   type: "twitter",
   username: "cristiano",
-  browserContext: getBrowserContext({
-    // optional
-    chromiumPath: "/path/to/chromium",
-  }),
 })
 await destroyBrowser()
 ```
@@ -42,7 +38,6 @@ await destroyBrowser()
 Notes:
 
 - `instagram` requires authentication, you can create a dummy account for this
-- `twitter` follower count is fetched using headless chrome
 
 ## Documentation
 
