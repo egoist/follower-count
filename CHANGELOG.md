@@ -1,5 +1,9 @@
 ## Unreleased
 
+No unreleased changes.
+
+## 0.2.3
+
 - twitter: Now you don't need headless chrome to fetch the follower count, it uses the twitter follow button api if a `browserContext` is not provided.
 
 ## 0.2.2
