@@ -2,6 +2,7 @@ import { igApi as IgApi, getSessionId as getIgSessionId } from "insta-fetcher"
 import axios from "axios"
 import { getChannelInfo } from "yt-channel-info"
 import { BrowserContext } from "playwright-core"
+import { getYoutubeChannelId } from "./utils"
 
 export type Options =
   | {
@@ -42,15 +43,6 @@ export type Options =
     }
 
 const USER_AGENT = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36`
-
-const getYoutubeChannelId = (channel: string) => {
-  if (channel.startsWith("https:")) {
-    return channel
-      .replace(/^https?:\/\/www.youtube.com\/(c|user)\//, "")
-      .split("/")[0]
-  }
-  return channel
-}
 
 export const getFollowerCount = async (options: Options): Promise<number> => {
   if (options.type === "instagram") {
