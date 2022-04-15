@@ -15,17 +15,6 @@ npm i follower-count
 ## Example
 
 ```ts
-// Instagram:
-import { getFollowerCount } from "follower-count"
-await getFollowerCount({
-  type: "instagram",
-  username: "cristiano",
-  auth: {
-    username: "username",
-    password: "password",
-  },
-})
-
 // Twitter:
 import { getBrowserContext, destroyBrowser } from "follower-count"
 await getFollowerCount({
@@ -33,6 +22,14 @@ await getFollowerCount({
   username: "cristiano",
 })
 await destroyBrowser()
+
+// Instagram:
+import { getFollowerCount, getIgSessionIg } from "follower-count"
+await getFollowerCount({
+  type: "instagram",
+  username: "cristiano",
+  sessionId: await getIgSessionIg("DUMMY_USER", "DUMMY_PASSWORD"),
+})
 ```
 
 Notes:

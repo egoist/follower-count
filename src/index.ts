@@ -1,4 +1,3 @@
-import { igApi as IgApi, getSessionId as getIgSessionId } from "insta-fetcher"
 import axios from "axios"
 import { getChannelInfo } from "yt-channel-info"
 import { BrowserContext } from "playwright-core"
@@ -7,15 +6,13 @@ import {
   getTwitterFollowerCountWithBrowser,
   getTwitterFollowerCountWithEmbedApi,
 } from "./twitter"
+import { getIgFollowerCount, getIgSessionId } from "./instagram"
 
 export type Options =
   | {
       type: "instagram"
       username: string
-      auth: {
-        username: string
-        password: string
-      }
+      sessionId: string
     }
   | {
       type: "youtube"
@@ -49,7 +46,7 @@ const USER_AGENT = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/
 
 export const getFollowerCount = async (options: Options): Promise<number> => {
   if (options.type === "instagram") {
-    return getInstagramFollowerCount(options.username, options.auth)
+    return getInstagramFollowerCount(options.username, options.sessionId)
   }
 
   if (options.type === "youtube") {
@@ -72,14 +69,13 @@ export const getFollowerCount = async (options: Options): Promise<number> => {
   throw new Error(`Unknown type: ${(options as any).type}`)
 }
 
+export { getIgSessionId }
+
 export async function getInstagramFollowerCount(
   username: string,
-  auth: { username: string; password: string },
+  sessionId: string,
 ) {
-  const sessionId = await getIgSessionId(auth.username, auth.password)
-  const ig = new IgApi(sessionId)
-  const user = await ig.fetchUser(username)
-  return user.followers
+  return getIgFollowerCount(username, sessionId)
 }
 
 export async function getYoutubeFollowerCount(channel: string) {

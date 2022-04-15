@@ -1,6 +1,27 @@
 ## Unreleased
 
-No unreleased changes.
+Breaking:
+
+- instagram: handle user not found error, new api:
+
+  ```ts
+  // Prev:
+  getFollowerCount({
+    type: "instagram",
+    username: "cristiano",
+    auth: {
+      username,
+      password,
+    },
+  })
+
+  // Now:
+  getFollowerCount({
+    type: "instagram",
+    username: "cristiano",
+    sessionId: getIgSessionId(username, password),
+  })
+  ```
 
 ## 0.2.3
 
