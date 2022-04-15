@@ -1,5 +1,9 @@
 ## Unreleased
 
+No unreleased changes.
+
+## 0.3.0
+
 Breaking:
 
 - instagram: handle user not found error, new api:

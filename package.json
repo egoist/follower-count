@@ -1,6 +1,6 @@
 {
   "name": "follower-count",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Get follower count for Instagram, Twitter, TikTok, Youtube accounts",
   "publishConfig": {
     "access": "public"
