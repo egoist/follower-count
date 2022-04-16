@@ -49,3 +49,4 @@ jobs:
         run: pnpm test
         env:
           VITE_IG_PASSWORD: ${{ secrets.IG_PASSWORD }}
+          VITE_IG_USER: ${{ secrets.IG_USER }}
