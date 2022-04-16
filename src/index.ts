@@ -69,8 +69,6 @@ export const getFollowerCount = async (options: Options): Promise<number> => {
   throw new Error(`Unknown type: ${(options as any).type}`)
 }
 
-export { getIgSessionId }
-
 export async function getInstagramFollowerCount(
   username: string,
   sessionId: string,
@@ -105,4 +103,9 @@ export * from "./browser"
 export const isAxiosError = (payload: any): payload is AxiosError =>
   axios.isAxiosError(payload)
 
-export { axios }
+export {
+  axios,
+  getIgSessionId,
+  getTwitterFollowerCountWithBrowser,
+  getTwitterFollowerCountWithEmbedApi,
+}

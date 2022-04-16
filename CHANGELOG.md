@@ -1,6 +1,6 @@
 ## Unreleased
 
-No unreleased changes.
+- export twitter functions
 
 ## 0.4.0
 
