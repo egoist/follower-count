@@ -1,5 +1,6 @@
 declare interface ImportMeta {
   env: {
+    VITE_IG_USER: string
     VITE_IG_PASSWORD: string
   }
 }

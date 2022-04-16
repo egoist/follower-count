@@ -1,6 +1,20 @@
 ## Unreleased
 
-No unreleased changes.
+Breaking:
+
+- instagram: exposing original axios error, you can check if the error is an axios error by:
+
+  ```ts
+  import { isAxiosError } from "follower-count"
+
+  try {
+    await getFollowerCount()
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.log(error.response.status)
+    }
+  }
+  ```
 
 ## 0.3.0
 

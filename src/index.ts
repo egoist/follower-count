@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import { getChannelInfo } from "yt-channel-info"
 import { BrowserContext } from "playwright-core"
 import { getYoutubeChannelId } from "./utils"
@@ -101,3 +101,8 @@ export async function getTikTokFollowerCount(username: string) {
 }
 
 export * from "./browser"
+
+export const isAxiosError = (payload: any): payload is AxiosError =>
+  axios.isAxiosError(payload)
+
+export { axios }

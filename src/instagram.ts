@@ -6,39 +6,22 @@ import axios, { AxiosRequestHeaders, AxiosResponse } from "axios"
 const config = {
   /** Instagram Base URL */
   instagram_base_url: "https://www.instagram.com",
-  instagram_base_z4: "https://z-p4.www.instagram.com",
-  /** Instagram Api Stories */
-  instagram_stories_url: "https://i.instagram.com/api/v1/feed/user",
-  /** Instagram Api Fetch User Data */
-  instagram_user_url: "https://i.instagram.com/api/v1/users",
-  /** Instagram API Search User */
-  instagram_search_url:
-    "https://www.instagram.com/web/search/topsearch/?query=",
-  /** Instagram GraphQL query */
-  instagram_graphql: "https://www.instagram.com/graphql/query/",
-  /** Android User-Agent */
-  android:
-    "Instagram 10.8.0 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)",
-  /** Desktop User-Agent */
-  desktop:
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
-  /** iPhone User-Agent */
-  iPhone:
-    "Instagram 123.0.0.21.114 (iPhone; CPU iPhone OS 11_4 like Mac OS X; en_US; en-US; scale=2.00; 750x1334) AppleWebKit/605.1.15",
+  accept_language: "en-US,en",
+  mobile: `Mozilla/5.0 (Linux; Android 10; SM-A102U Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/80.0.3987.99 Mobile Safari/537.36 Instagram 167.0.0.24.120 Android (29/10; 320dpi; 720x1402; samsung; SM-A102U; a10e; exynos7884B; en_US; 256966589)`,
 }
 
 const buildHeaders = ({
-  userAgent = config.android,
+  userAgent = config.mobile,
   sessionId,
 }: {
-  userAgent: string
-  sessionId: string
+  userAgent?: string
+  sessionId?: string
 }) => {
-  return {
+  const headers: Record<string, string> = {
     "cache-control": "no-cache",
     "user-agent": userAgent,
     cookie: `sessionid=${sessionId};`,
-    "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7,pt;q=0.6,ru;q=0.5",
+    "accept-language": config.accept_language,
     "Accept-Encoding": "gzip, deflate, br",
     pragma: "no-cache",
     "sec-fetch-mode": "navigate",
@@ -46,22 +29,25 @@ const buildHeaders = ({
     "sec-fetch-user": "?1",
     "upgrade-insecure-requests": "1",
   }
+  if (!sessionId) {
+    delete headers.cookie
+  }
+  return headers
 }
 
 const getCsrfToken = async (): Promise<string> => {
-  try {
-    const { headers } = await axios({
-      method: "GET",
-      url: "https://www.instagram.com/accounts/login/",
-    })
-    let csrfToken: string =
-      headers["set-cookie"]
-        ?.find((x) => x.match(/csrftoken=(.*?);/)?.[1])
-        ?.match(/csrftoken=(.*?);/)?.[1] || ""
-    return csrfToken
-  } catch (error) {
-    throw error
-  }
+  const requestHeaders = buildHeaders({})
+
+  const { headers } = await axios({
+    method: "GET",
+    url: "https://www.instagram.com/accounts/login/",
+    headers: requestHeaders,
+  })
+  let csrfToken: string =
+    headers["set-cookie"]
+      ?.find((x) => x.match(/csrftoken=(.*?);/)?.[1])
+      ?.match(/csrftoken=(.*?);/)?.[1] || ""
+  return csrfToken
 }
 
 export const getIgSessionId = async (
@@ -79,13 +65,13 @@ export const getIgSessionId = async (
   const csrfToken = await getCsrfToken()
   const genHeaders: AxiosRequestHeaders = {
     "X-CSRFToken": csrfToken,
-    "user-agent": config.desktop,
+    "user-agent": config.mobile,
     "cache-Control": "no-cache",
     "content-type": "application/x-www-form-urlencoded",
     referer: "https://www.instagram.com/accounts/login/?source=auth_switcher",
     authority: "www.instagram.com",
     origin: "https://www.instagram.com",
-    "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+    "accept-language": config.accept_language,
     "sec-fetch-site": "same-origin",
     "sec-fetch-mode": "cors",
     "sec-fetch-dest": "empty",
@@ -121,20 +107,9 @@ export async function getIgFollowerCount(
   username: string,
   sessionId: string,
 ): Promise<number> {
-  try {
-    const { data } = await axios({
-      url: `${config.instagram_base_url}/${username}/?__a=1`,
-      headers: buildHeaders({ userAgent: config.android, sessionId }),
-    })
-    return data.graphql?.user?.edge_followed_by?.count || 0
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      if (error.response?.status === 404) {
-        throw new Error(`user not found`)
-      } else if (error.response?.status === 429) {
-        throw new Error(`too many request`)
-      }
-    }
-    throw error
-  }
+  const { data } = await axios({
+    url: `${config.instagram_base_url}/${username}/?__a=1`,
+    headers: buildHeaders({ userAgent: config.mobile, sessionId }),
+  })
+  return data.graphql?.user?.edge_followed_by?.count || 0
 }
