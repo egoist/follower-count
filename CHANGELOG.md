@@ -1,5 +1,9 @@
 ## Unreleased
 
+No unreleased changes.
+
+## 0.4.0
+
 Breaking:
 
 - instagram: exposing original axios error, you can check if the error is an axios error by:
