@@ -14,7 +14,7 @@ test("youtube channel id", async () => {
 test("youtube channel url", async () => {
   const count = await getFollowerCount({
     type: "youtube",
-    channel: "https://www.youtube.com/c/AlexanderZiskind",
+    channel: "https://www.youtube.com/channel/UCshily63dXlJL0J4A7ZMJ3Q",
   })
 
   console.log(count)

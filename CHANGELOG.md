@@ -1,6 +1,6 @@
 ## Unreleased
 
-No unreleased changes.
+- youtube: support url format: `https://www.youtube.com/channel/<channel_id>`
 
 ## 0.4.1
 
