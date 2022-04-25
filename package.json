@@ -32,7 +32,7 @@
     "vitest": "0.9.3"
   },
   "dependencies": {
-    "axios": "^0.26.1",
+    "axios": "^0.27.0",
     "node-fetch": "^3.2.3",
     "playwright-core": "^1.20.0",
     "yt-channel-info": "^3.0.3"
