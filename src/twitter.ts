@@ -1,18 +1,18 @@
-import axios from "axios"
 import { BrowserContext } from "playwright-core"
+import { fetchEnhanced } from "./fetch"
 
 export async function getTwitterFollowerCountWithEmbedApi(
   username: string,
 ): Promise<number> {
-  return axios
-    .get(
-      `https://cdn.syndication.twimg.com/widgets/followbutton/info.json?screen_names=${username}&v=${Date.now()}`,
-    )
-    .then((res) => {
-      if (res.data.length === 0) {
+  return fetchEnhanced(
+    `https://cdn.syndication.twimg.com/widgets/followbutton/info.json?screen_names=${username}&v=${Date.now()}`,
+  )
+    .then((res) => res.json())
+    .then((data: any) => {
+      if (data.length === 0) {
         throw new Error(`twitter user "${username}" does not exist`)
       }
-      return res.data[0].followers_count
+      return data[0].followers_count
     })
 }
 

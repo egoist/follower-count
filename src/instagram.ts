@@ -1,7 +1,7 @@
 // Modified from:
 // MIT Licensed: https://github.com/Gimenz/insta-fetcher
 
-import axios, { AxiosRequestHeaders, AxiosResponse } from "axios"
+import { fetchEnhanced } from "./fetch"
 
 const config = {
   /** Instagram Base URL */
@@ -38,15 +38,13 @@ const buildHeaders = ({
 const getCsrfToken = async (): Promise<string> => {
   const requestHeaders = buildHeaders({})
 
-  const { headers } = await axios({
+  const res = await fetchEnhanced("https://www.instagram.com/accounts/login/", {
     method: "GET",
-    url: "https://www.instagram.com/accounts/login/",
     headers: requestHeaders,
   })
-  let csrfToken: string =
-    headers["set-cookie"]
-      ?.find((x) => x.match(/csrftoken=(.*?);/)?.[1])
-      ?.match(/csrftoken=(.*?);/)?.[1] || ""
+  const setCookieHeader = res.headers.get("set-cookie")
+  const csrfToken: string =
+    setCookieHeader?.match(/csrftoken=(.*?);/)?.[1] || ""
   return csrfToken
 }
 
@@ -63,7 +61,7 @@ export const getIgSessionId = async (
   }
 
   const csrfToken = await getCsrfToken()
-  const genHeaders: AxiosRequestHeaders = {
+  const genHeaders: Record<string, string> = {
     "X-CSRFToken": csrfToken,
     "user-agent": config.mobile,
     "cache-Control": "no-cache",
@@ -82,19 +80,19 @@ export const getIgSessionId = async (
     Cookie: "csrftoken=" + csrfToken + ";",
   }
 
-  const { headers, data }: AxiosResponse = await axios({
-    method: "POST",
-    url: "https://www.instagram.com/accounts/login/ajax/",
-    data: `username=${username}&enc_password=#PWD_INSTAGRAM_BROWSER:0:${Date.now()}:${password}&queryParams=%7B%22source%22%3A%22auth_switcher%22%7D&optIntoOneTap=false`,
-    headers: genHeaders,
-  })
+  const res = await fetchEnhanced(
+    "https://www.instagram.com/accounts/login/ajax/",
+    {
+      method: "POST",
+      body: `username=${username}&enc_password=#PWD_INSTAGRAM_BROWSER:0:${Date.now()}:${password}&queryParams=%7B%22source%22%3A%22auth_switcher%22%7D&optIntoOneTap=false`,
+      headers: genHeaders,
+    },
+  )
 
-  const { authenticated } = data
+  const { authenticated } = (await res.json()) as any
   if (authenticated) {
     let session_id: string =
-      headers["set-cookie"]
-        ?.find((x) => x.match(/sessionid=(.*?);/)?.[1])
-        ?.match(/sessionid=(.*?);/)?.[1] || ""
+      res.headers.get("set-cookie")?.match(/sessionid=(.*?);/)?.[1] || ""
     return session_id
   }
 
@@ -107,9 +105,12 @@ export async function getIgFollowerCount(
   username: string,
   sessionId: string,
 ): Promise<number> {
-  const { data } = await axios({
-    url: `${config.instagram_base_url}/${username}/?__a=1`,
-    headers: buildHeaders({ userAgent: config.mobile, sessionId }),
-  })
+  const res = await fetchEnhanced(
+    `${config.instagram_base_url}/${username}/?__a=1`,
+    {
+      headers: buildHeaders({ userAgent: config.mobile, sessionId }),
+    },
+  )
+  const data = (await res.json()) as any
   return data.graphql?.user?.edge_followed_by?.count || 0
 }

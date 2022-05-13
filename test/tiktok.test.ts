@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { getFollowerCount, isAxiosError } from "../src"
+import { getFollowerCount, isFetchError } from "../src"
 
 test("tiktok", async () => {
   const count = await getFollowerCount({
@@ -19,8 +19,8 @@ test("tiktok user not found", async () => {
     })
     expect.fail()
   } catch (error) {
-    if (isAxiosError(error)) {
-      expect(error.response?.status).toBe(404)
+    if (isFetchError(error)) {
+      expect(error.response.status).toBe(404)
     } else {
       expect.fail()
     }

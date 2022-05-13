@@ -1,4 +1,3 @@
-import axios, { AxiosError } from "axios"
 import { getChannelInfo } from "yt-channel-info"
 import { BrowserContext } from "playwright-core"
 import { getYoutubeChannelId } from "./utils"
@@ -7,6 +6,7 @@ import {
   getTwitterFollowerCountWithEmbedApi,
 } from "./twitter"
 import { getIgFollowerCount, getIgSessionId } from "./instagram"
+import { fetchEnhanced } from "./fetch"
 
 export type Options =
   | {
@@ -41,8 +41,6 @@ export type Options =
        */
       browserContext?: BrowserContext
     }
-
-const USER_AGENT = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36`
 
 export const getFollowerCount = async (options: Options): Promise<number> => {
   if (options.type === "instagram") {
@@ -85,26 +83,21 @@ export async function getYoutubeFollowerCount(channel: string) {
 }
 
 export async function getTikTokFollowerCount(username: string) {
-  const { data } = await axios(`https://www.tiktok.com/@${username}`, {
-    responseType: "text",
-    headers: {
-      // TikTok requires a user-agent, otherwise it will return an empty string
-      "user-agent": USER_AGENT,
-    },
-  })
+  const text = await fetchEnhanced(
+    `https://www.tiktok.com/@${username}`,
+    {},
+  ).then((res) => res.text())
 
-  const m = /"authorStats":{"followerCount":(\d+),/.exec(data)
+  const m = /"authorStats":{"followerCount":(\d+),/.exec(text)
 
   return m ? parseInt(m[1]) : 0
 }
 
 export * from "./browser"
 
-export const isAxiosError = (payload: any): payload is AxiosError =>
-  axios.isAxiosError(payload)
+export { isFetchError } from "./fetch"
 
 export {
-  axios,
   getIgSessionId,
   getTwitterFollowerCountWithBrowser,
   getTwitterFollowerCountWithEmbedApi,
