@@ -21,3 +21,14 @@ test("youtube channel url", async () => {
   expect(count).toBeGreaterThan(0)
   expect(Number.isInteger(count)).toBe(true)
 })
+
+test("youtube channel url without www", async () => {
+  const count = await getFollowerCount({
+    type: "youtube",
+    channel: "https://youtube.com/channel/UC-py03XrXqLq197c6kMYI_A",
+  })
+
+  console.log(count)
+  expect(count).toBeGreaterThan(0)
+  expect(Number.isInteger(count)).toBe(true)
+})
