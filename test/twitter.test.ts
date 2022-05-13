@@ -20,3 +20,15 @@ test("twitter", async () => {
   expect(countByBrowser).toBeGreaterThan(0)
   expect(countByApi).toBeGreaterThan(0)
 })
+
+test("twitter 404", async () => {
+  try {
+    await getFollowerCount({
+      type: "twitter",
+      username: "asdkjlkjrelwjrkeljkdsjk",
+    })
+    expect.fail()
+  } catch (error: any) {
+    expect(error.message).toContain("does not exist")
+  }
+})
