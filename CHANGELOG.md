@@ -1,6 +1,7 @@
 ## Unreleased
 
-No unreleased changes.
+- Migrate from `axios` to `node-fetch`
+- Allow Youtube URL without `www.`
 
 ## 0.4.2
 
