@@ -28,7 +28,7 @@
     "kanpai": "0.10.1",
     "node-fetch": "^3.2.4",
     "prettier": "2.6.2",
-    "tsup": "5.12.5",
+    "tsup": "6.1.2",
     "typescript": "4.6.3",
     "vitest": "0.9.3"
   },
